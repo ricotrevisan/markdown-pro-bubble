@@ -140,6 +140,15 @@
       "name": "disableForced4SpacesIndentedSublists",
       "rank": 10,
       "value": "boolean"
+    },
+    "AAu": {
+      "caption": "latex",
+      "default_val": true,
+      "doc": "Enable LaTeX/KaTeX math rendering. Supports $$display$$, $inline$, \\[display\\], \\(inline\\), and ~asciimath~ formats",
+      "editor": "DynamicValue",
+      "name": "latex",
+      "rank": 12,
+      "value": "boolean"
     }
   },
   "headers": {
