@@ -53,3 +53,10 @@ This project is built on top of an open-source stack. Consider supporting the ma
 - **me**: [PayPal](https://paypal.me/), [Patreon](https://patreon.com/)
 
 You can also contribute by improving the code, documentation, or helping out others in the community.
+
+### Local tests and CI
+
+See [the harness test guide](tests/README.md) for reproducible Node 24.19.0 setup,
+Chromium/Firefox/WebKit coverage, package provenance and real-Bubble limitations.
+Run `npm ci`, `npx playwright install --with-deps chromium firefox webkit`, then
+`npm test`. Browser tests use only local dependencies on loopback port 4181.
