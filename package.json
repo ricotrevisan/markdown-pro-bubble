@@ -1,0 +1,25 @@
+{
+  "name": "markdown-pro-bubble-tests",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "24.19.0"
+  },
+  "scripts": {
+    "build:test": "node tests/browser/build.mjs",
+    "test:contract": "node --test tests/contract/*.test.mjs",
+    "test:browser": "npm run build:test && playwright test",
+    "test": "npm run test:contract && npm run test:browser"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.58.2",
+    "@rico/bubble-element-test-harness": "file:vendor/rico-bubble-element-test-harness-0.1.0.tgz",
+    "esbuild": "0.25.12",
+    "highlight-styles": "npm:highlight.js@11.7.0",
+    "highlight.js": "11.11.1",
+    "katex": "0.16.21",
+    "katex-header": "npm:katex@0.16.9",
+    "showdown": "2.1.0",
+    "showdown-katex": "0.8.0"
+  }
+}

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>Markdown adapter fixture</title>
+<!-- Fixture-owned real styles: preserve header versions, titles and attributes. -->
+<link rel="stylesheet" title="Default" href="/node_modules/highlight-styles/styles/default.css">
+<link rel="alternate stylesheet" title="Github" href="/node_modules/highlight-styles/styles/github.css" disabled="disabled">
+<link rel="alternate stylesheet" title="Monokai" href="/node_modules/highlight-styles/styles/monokai.css" disabled="disabled">
+<link rel="stylesheet" href="/node_modules/katex-header/dist/katex.min.css">
+<script src="/node_modules/katex-header/dist/katex.min.js"></script>
+<script src="/.test-runtime/runtime.js"></script>
+<body><div id="canvases"></div><div id="outputs"></div>
+<script type="module">
+import { loadCallbacks, createHarness } from '/node_modules/@rico/bubble-element-test-harness/src/index.js';
+const base = '/src/elements/md-to-html/';
+const callbacks = await loadCallbacks({ initialize: base + 'initialize.js', update: base + 'update.js', reset: base + 'reset.js', actions: { highlight: base + 'actions/highlight-code.js' } });
+window.make = () => {
+  const canvas = document.createElement('div');
+  document.querySelector('#canvases').append(canvas);
+  const h = createHarness({ callbacks, canvas: [canvas], context: {} });
+  h.initialize();
+  return h;
+};
+// Explicit adapter property spelling, not generated Bubble defaults.
+window.props = (overrides = {}) => ({ markdown: '# Alpha', style: 'Default', dynamicStyle: '', latex: false, tables: true, simplelinebreaks: true, smoothlivepreview: true, parseimgdimensions: true, strikethrough: true, emoji: true, disableForced4SpacesIndentedSublists: true, openLinksInNewWindow: false, ...overrides });
+// Rendering is a consumer of the publication; the element itself never renders.
+window.render = h => {
+  const output = document.createElement('section');
+  output.innerHTML = h.states.html;
+  document.querySelector('#outputs').append(output);
+  return output;
+};
+window.a = make();
+window.ready = true;
+</script></body></html>
