@@ -4,16 +4,16 @@ Run with Node **24.19.0** (see `.node-version`):
 
 ```sh
 npm ci
+npm ci --prefix lib
 npx playwright install --with-deps chromium firefox webkit
 npm test
 ```
 
-`npm test` runs Node contract tests, bundles real npm runtime dependencies with
-esbuild, then runs Playwright 1.58.2 in Chromium, Firefox and WebKit. The server
-binds only `127.0.0.1:4181` and refuses to reuse another server. CI uses the same
-commands. There was no previous test/build infrastructure or TypeScript source;
-there is no production build or type migration added here. Generated runtime,
-traces and installed packages are ignored. Source callback compilation is checked.
+`npm test` runs Node contract tests, builds the production runtime bundle
+(`lib/dist.js`, see `lib/package.json`), then runs Playwright 1.58.2 in Chromium,
+Firefox and WebKit. The server binds only `127.0.0.1:4181` and refuses to reuse
+another server. CI uses the same commands. Built bundles, traces and installed
+packages are ignored. Source callback compilation is checked.
 
 ## Shared seam and package provenance
 
@@ -44,17 +44,18 @@ readiness. Publications/events are synchronous in this adapter.
 
 ## Runtime fidelity
 
-The local fixture bundles actual npm packages matching `src/shared.html`:
-Showdown 2.1.0, Highlight.js 11.11.1, showdown-katex 0.8.0 and global KaTeX 0.16.21.
-It first loads the header's KaTeX 0.16.9 script, then the bundle replaces the global,
-as the module in the actual header does. CSS/fonts come from KaTeX 0.16.9 and
-Highlight.js 11.7.0. These versions differ from the README's older summary.
-The extension's published browser build embeds its own older KaTeX; setting
-`window.katex` does not replace that internal renderer. The lock also retains its
-npm KaTeX 0.11.x dependency. Tests exercise the published browser build, not esm.sh's
-remote transform/cache, network timing or Bubble's module loading order.
+The fixture loads the same `lib/dist.js` that is uploaded to Bubble, built from
+`lib/index.js` with Showdown 2.1.0, Highlight.js 11.11.1, showdown-katex 0.8.0 and
+KaTeX 0.16.21. A clean `lib/` build is byte-identical to the live asset
+`//meta-q.cdn.bubble.io/f1780515404463x610209362129781900/dist.js`
+(SHA-256 `9d53bc0b29533484b15432cc5a035da3a25cb3417f50bf3f5cb53d09eeb8792b`).
+As in the production header, only KaTeX 0.16.9 CSS/fonts and Highlight.js 11.7.0
+theme CSS come from separate files. These versions differ from the README's older
+summary. The extension's published browser build embeds its own older KaTeX;
+setting `window.katex` does not replace that internal renderer. Tests do not
+exercise Bubble's CDN, `defer` timing or header loading order.
 
-`.npmrc` uses `legacy-peer-deps=true` because showdown-katex declares a Showdown
+`lib/.npmrc` uses `legacy-peer-deps=true` because showdown-katex declares a Showdown
 1.x peer range while the plugin explicitly uses 2.1.0. This reproduces the current
 plugin combination rather than silently upgrading dependencies. `npm audit`
 reported six findings (three low, three moderate) in this retained dependency

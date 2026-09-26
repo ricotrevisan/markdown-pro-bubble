@@ -5,13 +5,13 @@
 <link rel="alternate stylesheet" title="Github" href="/node_modules/highlight-styles/styles/github.css" disabled="disabled">
 <link rel="alternate stylesheet" title="Monokai" href="/node_modules/highlight-styles/styles/monokai.css" disabled="disabled">
 <link rel="stylesheet" href="/node_modules/katex-header/dist/katex.min.css">
-<script src="/node_modules/katex-header/dist/katex.min.js"></script>
-<script src="/.test-runtime/runtime.js"></script>
+<!-- The production header loads only KaTeX CSS plus the runtime bundle. -->
+<script src="/lib/dist.js"></script>
 <body><div id="canvases"></div><div id="outputs"></div>
 <script type="module">
 import { loadCallbacks, createHarness } from '/node_modules/@rico/bubble-element-test-harness/src/index.js';
-const base = '/src/elements/md-to-html/';
-const callbacks = await loadCallbacks({ initialize: base + 'initialize.js', update: base + 'update.js', reset: base + 'reset.js', actions: { highlight: base + 'actions/highlight-code.js' } });
+const base = '/src/elements/md-to-html-AAC/';
+const callbacks = await loadCallbacks({ initialize: base + 'initialize.js', update: base + 'update.js', reset: base + 'reset.js', actions: { highlight: base + 'actions/highlight-code-AAX.js' } });
 window.make = () => {
   const canvas = document.createElement('div');
   document.querySelector('#canvases').append(canvas);

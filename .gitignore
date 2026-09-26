@@ -1,5 +1,6 @@
 node_modules/
-.test-runtime/
+lib/dist.js
+lib/release/
 test-results/
 playwright-report/
 .src.json

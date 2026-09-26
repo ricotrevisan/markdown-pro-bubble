@@ -1,0 +1,23 @@
+{
+  "name": "markdown-pro-runtime",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Runtime bundle for the Markdown Pro Bubble plugin",
+  "main": "index.js",
+  "engines": {
+    "node": "24.19.0"
+  },
+  "scripts": {
+    "build": "esbuild index.js --bundle --platform=browser --format=iife --minify --outfile=dist.js",
+    "release": "npm run build && node scripts/release.mjs"
+  },
+  "dependencies": {
+    "highlight.js": "11.11.1",
+    "katex": "0.16.21",
+    "showdown": "2.1.0",
+    "showdown-katex": "0.8.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12"
+  }
+}
