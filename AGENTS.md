@@ -2,6 +2,10 @@
 
 Bubble plugin that converts markdown to styled HTML (Showdown, Highlight.js, KaTeX). Decoded source is in `src/`; Pled encodes it to `dist/`. See `README.md` for features.
 
+- Two code piles: `src/` is decoded Bubble plugin source (Pled uploads it); `lib/` is the runtime bundle (`dist.js`) that sets `window.hljs`, `window.showdown`, `window.showdownKatex` and `window.katex`.
+- From `lib/`: `npm ci && npm run build`. From the root: `npm ci && npm test` (needs `lib/` installed; the browser tests load `lib/dist.js`).
+- When `lib/` dependencies or `lib/index.js` change, release the bundle: `npm run release` in `lib/` writes a content-hashed file to `lib/release/`; `pled upload` it, set the `<script src>` in `src/elements/md-to-html-AAC/headers.html` to the returned URL, then `pled push`. Never reuse an uploaded filename.
+
 ## Bubble apps
 
 Use the **bubble-plugin-development** skill for the shared workflow (Pled, Buildprint branching, verifying against the real Bubble UI).

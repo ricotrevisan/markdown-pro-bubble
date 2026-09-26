@@ -7,8 +7,8 @@ const read = path => readFile(new URL('../../' + path, import.meta.url), 'utf8')
 const source = async element => Object.fromEntries(await Promise.all(['initialize', 'update', 'reset'].map(async name => [name, await read(`src/elements/${element}/${name}.js`)])));
 
 test('decoded callbacks compile with shared signatures, including actual highlight action', async () => {
-  const bodies = await source('md-to-html');
-  const callbacks = compileCallbacks({ ...bodies, actions: { highlight: await read('src/elements/md-to-html/actions/highlight-code.js') } });
+  const bodies = await source('md-to-html-AAC');
+  const callbacks = compileCallbacks({ ...bodies, actions: { highlight: await read('src/elements/md-to-html-AAC/actions/highlight-code-AAX.js') } });
   assert.equal(callbacks.initialize.length, 2);
   assert.equal(callbacks.update.length, 3);
   assert.equal(callbacks.reset.length, 2);
@@ -20,7 +20,7 @@ test('decoded callbacks compile with shared signatures, including actual highlig
 });
 
 test('deprecated typography callbacks are supplied no-ops, with no invented teardown', async () => {
-  const bodies = await source('deprecated-tw-typography');
+  const bodies = await source('deprecated-tw-typography-AAO');
   for (const body of Object.values(bodies)) assert.equal(body.trim(), '');
   const h = createHarness({ callbacks: compileCallbacks(bodies), canvas: [] });
   h.instance.data.sentinel = 'retained';
@@ -30,27 +30,31 @@ test('deprecated typography callbacks are supplied no-ops, with no invented tear
 });
 
 test('metadata outputs and explicit option spelling discrepancies stay reviewable', async () => {
-  const metadata = JSON.parse(await read('src/elements/md-to-html/AAC.json'));
+  const metadata = JSON.parse(await read('src/elements/md-to-html-AAC/AAC.json'));
   assert.deepEqual(Object.values(metadata.states).map(s => [s.name, s.value]), [['html', 'text']]);
   assert.deepEqual(Object.values(metadata.events).map(e => e.name), ['md_converted']);
   assert.equal(metadata.actions.AAX.caption, 'Highlight code');
   const names = Object.values(metadata.fields).map(f => f.name);
-  const update = (await source('md-to-html')).update;
+  const update = (await source('md-to-html-AAC')).update;
   const consumed = [...new Set([...update.matchAll(/properties\.(\w+)/g)].map(m => m[1]))];
   assert.deepEqual(consumed.filter(name => !names.includes(name)).sort(), ['parseimgdimensions', 'simplelinebreaks', 'smoothlivepreview']);
 });
 
-test('headers, local dependencies and fixture theme subset retain production versions', async () => {
-  const shared = await read('src/shared.html');
-  const headers = await read('src/elements/md-to-html/headers.html');
+test('headers load the lib runtime bundle, and fixture theme subset retains production versions', async () => {
+  assert.equal((await read('src/shared.html')).trim(), '');
+  const headers = await read('src/elements/md-to-html-AAC/headers.html');
+  const scripts = [...headers.matchAll(/<script\b[^>]*\bsrc="([^"]+)"/g)].map(m => m[1]);
+  assert.equal(scripts.length, 1);
+  assert.match(scripts[0], /^\/\/meta-q\.cdn\.bubble\.io\/f\d+x\d+\/[\w.-]+\.js$/);
+  const runtime = JSON.parse(await read('lib/package.json')).dependencies;
+  assert.deepEqual(runtime, { 'highlight.js': '11.11.1', katex: '0.16.21', showdown: '2.1.0', 'showdown-katex': '0.8.0' });
+  const entry = await read('lib/index.js');
+  for (const global of ['hljs', 'showdown', 'showdownKatex', 'katex']) assert.match(entry, new RegExp(`window\\.${global} = `));
   const pkg = JSON.parse(await read('package.json')).devDependencies;
-  for (const [alias, dep] of [['highlight.js', 'highlight.js'], ['showdown', 'showdown'], ['showdownKatex', 'showdown-katex'], ['katex', 'katex']]) {
-    assert.ok(shared.includes(`https://esm.sh/${dep}@${pkg[dep]}`), alias);
-  }
   assert.equal(pkg['highlight-styles'], 'npm:highlight.js@11.7.0');
   assert.equal(pkg['katex-header'], 'npm:katex@0.16.9');
   assert.ok(headers.includes('katex@0.16.9/dist/katex.min.css'));
-  const metadata = JSON.parse(await read('src/elements/md-to-html/AAC.json'));
+  const metadata = JSON.parse(await read('src/elements/md-to-html-AAC/AAC.json'));
   const titles = [...headers.matchAll(/title="([^"]+)"/g)].map(m => m[1]);
   assert.deepEqual(titles, metadata.fields.AAa.options.split(','));
   for (const title of ['Default', 'Github', 'Monokai']) assert.ok(titles.includes(title));

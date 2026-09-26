@@ -9,7 +9,11 @@ jobs:
         with:
           node-version-file: .node-version
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            lib/package-lock.json
       - run: npm ci
+      - run: npm ci --prefix lib
       - run: npx playwright install --with-deps chromium firefox webkit
       - run: npm test
       - uses: actions/upload-artifact@v4
