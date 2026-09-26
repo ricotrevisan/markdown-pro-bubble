@@ -1,3 +1,15 @@
+# Markdown Pro plugin
+
+Bubble plugin that converts markdown to styled HTML (Showdown, Highlight.js, KaTeX). Decoded source is in `src/`; Pled encodes it to `dist/`. See `README.md` for features.
+
+## Bubble apps
+
+Use the **bubble-plugin-development** skill for the shared workflow (Pled, Buildprint branching, verifying against the real Bubble UI).
+
+- Dev app: `tiptap-plugin`. Develop and verify plugin changes here.
+- Public demo pages: `nocode-to-knowcode`. Update them when a release changes what they show.
+- Both are Buildprint projects under the `ricowtf` profile. Run every command as `BUILDPRINT_PROFILE=ricowtf buildprint ...`.
+
 ## Agent skills
 
 ### Issue tracker
