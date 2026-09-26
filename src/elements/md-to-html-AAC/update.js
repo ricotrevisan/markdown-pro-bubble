@@ -1,5 +1,4 @@
-    
-  instance.data.nextStyle = properties.style;
+instance.data.nextStyle = properties.style;
 
   if (!!properties.dynamicStyle) {
     instance.data.nextStyle = properties.dynamicStyle;
@@ -67,4 +66,3 @@
 
   instance.publishState("html", html);
   instance.triggerEvent("md_converted");
-  

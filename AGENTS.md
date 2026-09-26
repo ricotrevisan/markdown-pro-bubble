@@ -6,9 +6,8 @@ Bubble plugin that converts markdown to styled HTML (Showdown, Highlight.js, KaT
 
 Use the **bubble-plugin-development** skill for the shared workflow (Pled, Buildprint branching, verifying against the real Bubble UI).
 
-- Dev app: `tiptap-plugin`. Develop and verify plugin changes here.
-- Public demo pages: `nocode-to-knowcode`. Update them when a release changes what they show.
-- Both are Buildprint projects under the `ricowtf` profile. Run every command as `BUILDPRINT_PROFILE=ricowtf buildprint ...`.
+- Dev app: `tiptap-plugin`. Develop and verify plugin changes here. Buildprint profile `ricowtf`: run every command as `BUILDPRINT_PROFILE=ricowtf buildprint ...`.
+- Public demo pages: `nocode-to-knowcode`. Buildprint cannot access this app (Bubble free plan). Edit it in the Bubble editor, and copy new sections over from `tiptap-plugin` (see the skill's "Public demo pages").
 
 ## Agent skills
 
