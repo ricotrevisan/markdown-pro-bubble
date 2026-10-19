@@ -72,8 +72,14 @@ reliably switches the browser's selected alternate stylesheet set.
 ## Coverage and established behavior
 
 - HTML publication precedes `md_converted`, event-time HTML is retained across
-  updates, and converters/data persist. The element does **not** render HTML;
-  the fixture explicitly inserts published output into a separate DOM container.
+  updates, and converters/data persist. With the new options off the element does
+  **not** render HTML; the fixture inserts published output into a separate container.
+- Show HTML in this element renders into `div.markdown-pro` plus the CSS class, and
+  removes it when turned off. Highlight code automatically highlights `pre code` in
+  the published html; unknown languages stay plain with the `hljs` class.
+- Streaming mode closes trailing fences (including a partial closer), completes a
+  table header or partial delimiter row, holds back a lone `|`, and coalesces updates
+  into one conversion per frame; turning it off converts synchronously.
 - Tables, line breaks, strikeout, emoji, reference-image dimensions, new-window
   links, smooth preview and two-space nested lists exercise actual output and
   updates. Inline image dimensions are parsed even when the option is false;

@@ -39,6 +39,19 @@ Join the conversation on the Bubble forum: [Markdown Pro Discussion](https://for
 3. The element outputs converted HTML and triggers the `md_converted` event
 4. Use the "Highlight code" action to apply syntax highlighting
 
+### Streaming AI replies
+
+Under **----- streaming & display ----** (all off by default, so existing apps don't change):
+
+- **Show HTML in this element**: the element shows the converted HTML itself in a
+  `div.markdown-pro`, so no separate HTML element is needed. Turn on *Fit height to content*.
+- **CSS class**: extra classes on that div, e.g. `md`, for your own CSS.
+- **Highlight code automatically**: code blocks are highlighted before the `html` state is
+  published, so no "Highlight code" action is needed, also with a separate HTML element.
+- **Streaming mode**: for text that grows while it arrives. Closes an unfinished trailing
+  code fence, turns a table header still waiting for its `---` row into a table, and
+  converts at most once per animation frame. It can stay on after the reply finishes.
+
 ## Development
 
 This plugin follows Bubble.io's element definition format with JavaScript functions in separate files for better maintainability.
