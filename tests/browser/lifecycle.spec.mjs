@@ -213,11 +213,12 @@ test('auto highlight publishes highlighted html, renders it, and tolerates unkno
   const result = await page.evaluate(() => {
     a.update(props({ markdown: '```javascript\nconst answer = 42;\n```\n\n```nosuchlang\nplain <b>\n```\n\n`inline`', auto_highlight: true, render_in_element: true }));
     const canvas = a.instance.canvas[0];
-    return { state: a.states.html, rendered: canvas.querySelectorAll('pre code.hljs').length, keyword: canvas.querySelectorAll('.hljs-keyword').length, inline: canvas.querySelector('p code').className, escaped: canvas.querySelectorAll('pre b').length, events: a.events.length };
+    return { state: a.states.html, unknown: canvas.querySelector('code.language-nosuchlang').className, rendered: canvas.querySelectorAll('pre code.hljs').length, keyword: canvas.querySelectorAll('.hljs-keyword').length, inline: canvas.querySelector('p code').className, escaped: canvas.querySelectorAll('pre b').length, events: a.events.length };
   });
   expect(result.state).toContain('<span class="hljs-keyword">const</span>');
   expect(result.keyword).toBe(1);
-  expect(result.rendered).toBeGreaterThanOrEqual(1);
+  expect(result.rendered).toBe(2);
+  expect(result.unknown).toBe('nosuchlang language-nosuchlang hljs');
   expect(result.inline).toBe('');
   expect(result.escaped).toBe(0);
   expect(result.events).toBe(1);
@@ -239,6 +240,8 @@ for (const [name, markdown, expected] of [
   ['table header only', 'Intro\n\n| A | B |', '<p>Intro</p>\n<table>\n<thead>\n<tr>\n<th>A</th>\n<th>B</th>\n</tr>\n</thead>\n<tbody>\n</tbody>\n</table>'],
   ['partial delimiter keeps alignment', '| A | B |\n| :---: | -', '<table>\n<thead>\n<tr>\n<th style="text-align:center;">A</th>\n<th>B</th>\n</tr>\n</thead>\n<tbody>\n</tbody>\n</table>'],
   ['pipes inside open fence stay code', '```\n| A |', '<pre><code>| A |\n</code></pre>'],
+  ['lone pipe of a starting table held back', 'Intro\n\n|', '<p>Intro</p>'],
+  ['lone pipe of a new body row kept', '| A | B |\n| --- | --- |\n|', '<table>\n<thead>\n<tr>\n<th>A</th>\n<th>B</th>\n</tr>\n</thead>\n<tbody>\n</tbody>\n</table>'],
   ['ended paragraph with pipes untouched', '| A | B |\n\nNext', '<p>| A | B |</p>\n<p>Next</p>'],
 ]) {
   test(`streaming completes ${name}`, async ({ page }) => {

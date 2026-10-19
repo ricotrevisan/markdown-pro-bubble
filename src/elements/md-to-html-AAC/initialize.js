@@ -40,6 +40,10 @@ try {
       return cell && /^\s*:?-{3,}:?\s*$/.test(cell) ? cell : " --- ";
     }).join("|") + "|";
     const n = rows.length;
+    // A lone "|" is a table that has only just started: hold it back
+    if (/^ {0,3}\|\s*$/.test(rows[n - 1]) && !isRow(rows[n - 2])) {
+      return rows.slice(0, -1).join("\n");
+    }
     if (isHeader(rows[n - 1]) && !isRow(rows[n - 2])) {
       return rows.concat(delimiter(rows[n - 1])).join("\n");
     }
@@ -55,6 +59,13 @@ try {
     const template = document.createElement("template");
     template.innerHTML = html;
     template.content.querySelectorAll("pre code").forEach(block => {
+      // Unknown or half-streamed language names ("javas"): keep the block
+      // plain but themed, without hljs warning on every render
+      const language = /\blanguage-(\S+)/.exec(block.className);
+      if (language && !hljs.getLanguage(language[1])) {
+        block.classList.add("hljs");
+        return;
+      }
       try {
         hljs.highlightElement(block);
       } catch (error) {

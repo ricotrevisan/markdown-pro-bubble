@@ -6,6 +6,7 @@
     }
   },
   "add_is_visible": true,
+  "can_fit_height": true,
   "category": "visual elements",
   "default_dim": {
     "height": 20,
@@ -182,7 +183,9 @@
   },
   "icon": "ion-code",
   "property_applications": {
-    "Font": false
+    "Font": false,
+    "MinWidth": true,
+    "resizable": true
   },
   "states": {
     "AAD": {
