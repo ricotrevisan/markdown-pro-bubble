@@ -61,8 +61,17 @@ instance.data.nextStyle = properties.style;
     instance.data.converter.setOption("openLinksInNewWindow", properties.openLinksInNewWindow);
   }
 
-  let text = properties.markdown,
-    html = instance.data.converter.makeHtml(text);
+  instance.data.pending = {
+    markdown: properties.markdown,
+    renderInElement: properties.render_in_element,
+    cssClass: properties.css_class,
+    autoHighlight: properties.auto_highlight,
+    streaming: properties.streaming,
+  };
 
-  instance.publishState("html", html);
-  instance.triggerEvent("md_converted");
+  if (properties.streaming) {
+    instance.data.scheduleConvert();
+  } else {
+    instance.data.cancelScheduledConvert();
+    instance.data.convert();
+  }

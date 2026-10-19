@@ -20,7 +20,7 @@ test.afterEach(async ({ page }) => { expect(observations.get(page)).toEqual([]);
 
 test('publishes before md_converted, renders supplied output, and preserves data across updates/reset', async ({ page }) => {
   const result = await page.evaluate(() => {
-    const initial = { ...a.instance.data };
+    const initial = Object.fromEntries(Object.entries(a.instance.data).filter(([, value]) => typeof value !== 'function'));
     a.update(props({ markdown: '# Alpha\n\n**bold** & <em>raw</em>' }));
     const converter = a.instance.data.converter;
     render(a);
@@ -190,4 +190,86 @@ test('smooth preview suppresses incomplete setext headings across repeated updat
     a.update(props({ markdown: 'Title\n=\n\nAfter', smoothlivepreview }));
     return render(a).querySelectorAll('h1').length;
   }))).toEqual([1, 0, 1]);
+});
+
+test('render in element: output div with class hook, sync updates, removed when turned off', async ({ page }) => {
+  const result = await page.evaluate(() => {
+    const canvas = a.instance.canvas[0];
+    a.update(props({ markdown: '# One', render_in_element: true, css_class: 'md  chat' }));
+    const first = { html: canvas.innerHTML, events: a.events.length };
+    const div = canvas.firstElementChild;
+    a.update(props({ markdown: '# Two', render_in_element: true, css_class: 'md' }));
+    const second = { same: canvas.firstElementChild === div, className: div.className, text: div.textContent, event: a.events.at(-1).states.html };
+    a.update(props({ markdown: '# Three', render_in_element: false }));
+    return { first, second, after: canvas.innerHTML, state: a.states.html };
+  });
+  expect(result.first).toEqual({ html: '<div class="markdown-pro md  chat"><h1 id="one">One</h1></div>', events: 1 });
+  expect(result.second).toEqual({ same: true, className: 'markdown-pro md', text: 'Two', event: '<h1 id="two">Two</h1>' });
+  expect(result.after).toBe('');
+  expect(result.state).toBe('<h1 id="three">Three</h1>');
+});
+
+test('auto highlight publishes highlighted html, renders it, and tolerates unknown languages', async ({ page }) => {
+  const result = await page.evaluate(() => {
+    a.update(props({ markdown: '```javascript\nconst answer = 42;\n```\n\n```nosuchlang\nplain <b>\n```\n\n`inline`', auto_highlight: true, render_in_element: true }));
+    const canvas = a.instance.canvas[0];
+    return { state: a.states.html, rendered: canvas.querySelectorAll('pre code.hljs').length, keyword: canvas.querySelectorAll('.hljs-keyword').length, inline: canvas.querySelector('p code').className, escaped: canvas.querySelectorAll('pre b').length, events: a.events.length };
+  });
+  expect(result.state).toContain('<span class="hljs-keyword">const</span>');
+  expect(result.keyword).toBe(1);
+  expect(result.rendered).toBeGreaterThanOrEqual(1);
+  expect(result.inline).toBe('');
+  expect(result.escaped).toBe(0);
+  expect(result.events).toBe(1);
+});
+
+test('without new options html and canvas stay as before', async ({ page }) => {
+  const result = await page.evaluate(() => {
+    a.update(props({ markdown: '```js\nconst a = 1;' }));
+    return { state: a.states.html, canvas: a.instance.canvas[0].innerHTML, events: a.events.length };
+  });
+  expect(result).toEqual({ state: '<p>```js<br />\nconst a = 1;</p>', canvas: '', events: 1 });
+});
+
+for (const [name, markdown, expected] of [
+  ['open code fence', 'Run:\n\n```js\nconst a = 1;', '<p>Run:</p>\n<pre><code class="js language-js">const a = 1;\n</code></pre>'],
+  ['bare fence opener', '```python', '<pre><code class="python language-python">\n</code></pre>'],
+  ['partial closing fence', '```js\nx\n``', '<pre><code class="js language-js">x\n</code></pre>'],
+  ['closed fence untouched', '```js\nx\n```\n\nafter', '<pre><code class="js language-js">x\n</code></pre>\n<p>after</p>'],
+  ['table header only', 'Intro\n\n| A | B |', '<p>Intro</p>\n<table>\n<thead>\n<tr>\n<th>A</th>\n<th>B</th>\n</tr>\n</thead>\n<tbody>\n</tbody>\n</table>'],
+  ['partial delimiter keeps alignment', '| A | B |\n| :---: | -', '<table>\n<thead>\n<tr>\n<th style="text-align:center;">A</th>\n<th>B</th>\n</tr>\n</thead>\n<tbody>\n</tbody>\n</table>'],
+  ['pipes inside open fence stay code', '```\n| A |', '<pre><code>| A |\n</code></pre>'],
+  ['ended paragraph with pipes untouched', '| A | B |\n\nNext', '<p>| A | B |</p>\n<p>Next</p>'],
+]) {
+  test(`streaming completes ${name}`, async ({ page }) => {
+    const html = await page.evaluate(async markdown => {
+      a.update(props({ markdown, streaming: true }));
+      await new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve)));
+      return a.states.html;
+    }, markdown);
+    expect(html).toBe(expected);
+  });
+}
+
+test('streaming coalesces updates into one conversion per frame with the latest text', async ({ page }) => {
+  const result = await page.evaluate(async () => {
+    const frame = () => new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve)));
+    const reply = 'Hello **world**, here is code:\n\n```js\nconst a = 1;\n```\n';
+    for (let i = 1; i <= reply.length; i++) a.update(props({ markdown: reply.slice(0, i), streaming: true, render_in_element: true }));
+    const beforeFrame = a.events.length;
+    await frame();
+    const afterFrame = { events: a.events.length, state: a.states.html, rendered: a.instance.canvas[0].firstElementChild.innerHTML };
+    a.update(props({ markdown: reply + 'Done.', streaming: true, render_in_element: true }));
+    a.update(props({ markdown: 'Final', streaming: false, render_in_element: true }));
+    const syncEvents = a.events.length;
+    await frame();
+    return { beforeFrame, afterFrame, syncEvents, final: a.states.html, finalEvents: a.events.length };
+  });
+  expect(result.beforeFrame).toBe(0);
+  expect(result.afterFrame.events).toBe(1);
+  expect(result.afterFrame.state).toBe('<p>Hello <strong>world</strong>, here is code:</p>\n<pre><code class="js language-js">const a = 1;\n</code></pre>');
+  expect(result.afterFrame.rendered).toBe(result.afterFrame.state);
+  expect(result.syncEvents).toBe(2);
+  expect(result.final).toBe('<p>Final</p>');
+  expect(result.finalEvents).toBe(2);
 });
