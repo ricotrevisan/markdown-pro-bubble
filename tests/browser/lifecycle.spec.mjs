@@ -240,6 +240,8 @@ for (const [name, markdown, expected] of [
   ['table header only', 'Intro\n\n| A | B |', '<p>Intro</p>\n<table>\n<thead>\n<tr>\n<th>A</th>\n<th>B</th>\n</tr>\n</thead>\n<tbody>\n</tbody>\n</table>'],
   ['partial delimiter keeps alignment', '| A | B |\n| :---: | -', '<table>\n<thead>\n<tr>\n<th style="text-align:center;">A</th>\n<th>B</th>\n</tr>\n</thead>\n<tbody>\n</tbody>\n</table>'],
   ['pipes inside open fence stay code', '```\n| A |', '<pre><code>| A |\n</code></pre>'],
+  ['one-column header without closing pipe', 'Intro\n\n| Mode', '<p>Intro</p>\n<table>\n<thead>\n<tr>\n<th>Mode</th>\n</tr>\n</thead>\n<tbody>\n</tbody>\n</table>'],
+  ['one-column header with partial delimiter', '| Mode\n| -', '<table>\n<thead>\n<tr>\n<th>Mode</th>\n</tr>\n</thead>\n<tbody>\n</tbody>\n</table>'],
   ['lone pipe of a starting table held back', 'Intro\n\n|', '<p>Intro</p>'],
   ['lone pipe of a new body row kept', '| A | B |\n| --- | --- |\n|', '<table>\n<thead>\n<tr>\n<th>A</th>\n<th>B</th>\n</tr>\n</thead>\n<tbody>\n</tbody>\n</table>'],
   ['ended paragraph with pipes untouched', '| A | B |\n\nNext', '<p>| A | B |</p>\n<p>Next</p>'],

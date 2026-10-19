@@ -44,11 +44,13 @@ try {
     if (/^ {0,3}\|\s*$/.test(rows[n - 1]) && !isRow(rows[n - 2])) {
       return rows.slice(0, -1).join("\n");
     }
+    // Showdown needs the closing pipe on a one-column header
+    const closed = line => /\|\s*$/.test(line.replace(/^ {0,3}\|/, "")) ? line : line + " |";
     if (isHeader(rows[n - 1]) && !isRow(rows[n - 2])) {
-      return rows.concat(delimiter(rows[n - 1])).join("\n");
+      return rows.slice(0, -1).concat(closed(rows[n - 1]), delimiter(rows[n - 1])).join("\n");
     }
     if (isPartialDelimiter(rows[n - 1]) && isHeader(rows[n - 2]) && !isRow(rows[n - 3])) {
-      return rows.slice(0, -1).concat(delimiter(rows[n - 2], rows[n - 1])).join("\n");
+      return rows.slice(0, -2).concat(closed(rows[n - 2]), delimiter(rows[n - 2], rows[n - 1])).join("\n");
     }
     return text;
   };
