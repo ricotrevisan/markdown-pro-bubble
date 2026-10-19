@@ -99,10 +99,10 @@ reliably switches the browser's selected alternate stylesheet set.
   both theme links can remain enabled because each instance only disables its
   own cached previous theme. Repeating A's update or resetting does not repair
   this. No isolation guarantee or new global theme ownership policy is imposed.
-- Three consumed property names (`simplelinebreaks`, `smoothlivepreview`,
-  `parseimgdimensions`) differ from metadata camel casing. Both the discrepancy
-  and missing alias behavior are asserted. Bubble's actual property-key mapping
-  must be verified before changing this longstanding contract.
+- `update` reads only property names defined in the element metadata. Bubble
+  passes properties by field `name`, so `simpleLineBreaks`,
+  `smoothLivePreview` and `parseImgDimensions` are read in camelCase; the old
+  lowercase spelling is ignored.
 - Both reset bodies are empty and tested as no-ops: no teardown, state clearing,
   stylesheet cleanup or destruction is invented. Deprecated typography's empty
   initialize/update/reset get proportionate Node contract coverage. Its remote

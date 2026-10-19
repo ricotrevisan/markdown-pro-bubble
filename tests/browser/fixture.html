@@ -20,7 +20,7 @@ window.make = () => {
   return h;
 };
 // Explicit adapter property spelling, not generated Bubble defaults.
-window.props = (overrides = {}) => ({ markdown: '# Alpha', style: 'Default', dynamicStyle: '', latex: false, tables: true, simplelinebreaks: true, smoothlivepreview: true, parseimgdimensions: true, strikethrough: true, emoji: true, disableForced4SpacesIndentedSublists: true, openLinksInNewWindow: false, ...overrides });
+window.props = (overrides = {}) => ({ markdown: '# Alpha', style: 'Default', dynamicStyle: '', latex: false, tables: true, simpleLineBreaks: true, smoothLivePreview: true, parseImgDimensions: true, strikethrough: true, emoji: true, disableForced4SpacesIndentedSublists: true, openLinksInNewWindow: false, ...overrides });
 // Rendering is a consumer of the publication; the element itself never renders.
 window.render = h => {
   const output = document.createElement('section');

@@ -45,9 +45,9 @@ test('publishes before md_converted, renders supplied output, and preserves data
 for (const scenario of [
   { option: 'disableForced4SpacesIndentedSublists', markdown: '- parent\n  - child\n  - child2\n- last', selector: 'ul ul' },
   { option: 'tables', markdown: '| A | B |\n| --- | --- |\n| one | two |', selector: 'table', text: 'one' },
-  { option: 'simplelinebreaks', markdown: 'one\ntwo', selector: 'br' },
+  { option: 'simpleLineBreaks', markdown: 'one\ntwo', selector: 'br' },
   { option: 'strikethrough', markdown: '~~gone~~', selector: 'del', text: 'gone' },
-  { option: 'parseimgdimensions', markdown: '![dot][image]\n\n[image]: /tests/browser/pixel.svg =20x30', selector: 'img[width="20"][height="30"]' },
+  { option: 'parseImgDimensions', markdown: '![dot][image]\n\n[image]: /tests/browser/pixel.svg =20x30', selector: 'img[width="20"][height="30"]' },
   { option: 'openLinksInNewWindow', markdown: '[link](/target)', selector: 'a[target="_blank"]' },
 ]) {
   test(`updates supported ${scenario.option} on/off/on without rebuilding converter`, async ({ page }) => {
@@ -70,7 +70,7 @@ test('emoji and less visible Showdown options update in both converter paths', a
   const result = await page.evaluate(() => {
     const snapshots = [];
     for (const enabled of [false, true, false]) {
-      a.update(props({ markdown: ':smile:', emoji: enabled, smoothlivepreview: enabled, disableForced4SpacesIndentedSublists: enabled, latex: enabled }));
+      a.update(props({ markdown: ':smile:', emoji: enabled, smoothLivePreview: enabled, disableForced4SpacesIndentedSublists: enabled, latex: enabled }));
       snapshots.push({ html: a.states.html, smooth: a.instance.data.converter.getOption('smoothLivePreview'), sublists: a.instance.data.converter.getOption('disableForced4SpacesIndentedSublists') });
     }
     return snapshots;
@@ -168,26 +168,28 @@ test('empty/missing markdown follows Showdown; invalid types and styles fail wit
   expect(result.after).toBe(5);
 });
 
-test('records current property spelling mismatch instead of pretending metadata supplies aliases', async ({ page }) => {
+test('reads the camelCase option names Bubble sends, not the old lowercase spelling', async ({ page }) => {
   expect(await page.evaluate(() => {
-    const p = props({ markdown: 'one\ntwo', simpleLineBreaks: true });
-    delete p.simplelinebreaks;
+    const p = props({ markdown: 'one\ntwo', simplelinebreaks: true });
+    delete p.simpleLineBreaks;
     a.update(p);
-    return a.states.html;
-  })).toBe('<p>one\ntwo</p>');
+    const lowercase = a.states.html;
+    a.update(props({ markdown: 'one\ntwo' }));
+    return [lowercase, a.states.html];
+  })).toEqual(['<p>one\ntwo</p>', '<p>one<br />\ntwo</p>']);
 });
 
 test('Showdown inline dimensions ignore the option and fragment links stay in the same window', async ({ page }) => {
   expect(await page.evaluate(() => {
-    a.update(props({ markdown: '![dot](/tests/browser/pixel.svg =20x30)\n\n[local](#target)', parseimgdimensions: false, openLinksInNewWindow: true }));
+    a.update(props({ markdown: '![dot](/tests/browser/pixel.svg =20x30)\n\n[local](#target)', parseImgDimensions: false, openLinksInNewWindow: true }));
     const output = render(a);
     return { width: output.querySelector('img').getAttribute('width'), target: output.querySelector('a').getAttribute('target') };
   })).toEqual({ width: '20', target: null });
 });
 
 test('smooth preview suppresses incomplete setext headings across repeated updates', async ({ page }) => {
-  expect(await page.evaluate(() => [false, true, false].map(smoothlivepreview => {
-    a.update(props({ markdown: 'Title\n=\n\nAfter', smoothlivepreview }));
+  expect(await page.evaluate(() => [false, true, false].map(smoothLivePreview => {
+    a.update(props({ markdown: 'Title\n=\n\nAfter', smoothLivePreview }));
     return render(a).querySelectorAll('h1').length;
   }))).toEqual([1, 0, 1]);
 });

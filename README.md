@@ -52,6 +52,12 @@ Under **----- streaming & display ----** (all off by default, so existing apps d
   code fence, turns a table header still waiting for its `---` row into a table, and
   converts at most once per animation frame. It can stay on after the reply finishes.
 
+### Line breaks and image sizes
+
+`simpleLineBreaks`, `smoothLivePreview` and `parseImgDimensions` were ignored before this
+release because the code read them under lowercase names. They are read now and default to
+yes, so a single line break becomes `<br />`. Set `simpleLineBreaks` to no to keep the old output.
+
 ## Development
 
 This plugin follows Bubble.io's element definition format with JavaScript functions in separate files for better maintainability.
