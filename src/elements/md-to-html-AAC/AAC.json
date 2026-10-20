@@ -6,6 +6,7 @@
     }
   },
   "add_is_visible": true,
+  "can_fit_height": true,
   "category": "visual elements",
   "default_dim": {
     "height": 20,
@@ -132,11 +133,59 @@
       "name": "latex",
       "rank": 12,
       "value": "boolean"
+    },
+    "AAv": {
+      "caption": "----- streaming & display ----",
+      "editor": "Label",
+      "name": "streaming_label",
+      "rank": 13
+    },
+    "AAw": {
+      "caption": "Show HTML in this element",
+      "default_val": false,
+      "doc": "'yes' = this element displays the converted HTML itself, inside a div with the class markdown-pro, so you don't need a separate HTML element. Turn on 'Fit height to content' so it grows with the text. 'no' = nothing is displayed; show the html state in an HTML element.",
+      "editor": "DynamicValue",
+      "name": "render_in_element",
+      "optional": true,
+      "rank": 14,
+      "value": "boolean"
+    },
+    "AAx": {
+      "caption": "CSS class",
+      "default_val": "",
+      "doc": "Extra class names (space separated) added to the markdown-pro div when 'Show HTML in this element' is on. Use them to style the output from your page or app header CSS, e.g. 'md' then .md h1 { ... }.",
+      "editor": "DynamicValue",
+      "name": "css_class",
+      "optional": true,
+      "rank": 15,
+      "value": "text"
+    },
+    "AAy": {
+      "caption": "Highlight code automatically",
+      "default_val": false,
+      "doc": "'yes' = code blocks are syntax highlighted on every conversion, before the html state is published, so you don't need the 'Highlight code' action. Works with 'Show HTML in this element' and with a separate HTML element.",
+      "editor": "DynamicValue",
+      "name": "auto_highlight",
+      "optional": true,
+      "rank": 16,
+      "value": "boolean"
+    },
+    "AAz": {
+      "caption": "Streaming mode",
+      "default_val": false,
+      "doc": "For text that grows while it arrives, like AI chat replies. 'yes' = closes an unfinished code block at the end, turns a table header that's still waiting for its --- row into a table, and converts at most once per animation frame (the latest text always wins). You can leave it on after the reply finishes.",
+      "editor": "DynamicValue",
+      "name": "streaming",
+      "optional": true,
+      "rank": 17,
+      "value": "boolean"
     }
   },
   "icon": "ion-code",
   "property_applications": {
-    "Font": false
+    "Font": false,
+    "MinWidth": true,
+    "resizable": true
   },
   "states": {
     "AAD": {

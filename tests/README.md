@@ -72,8 +72,14 @@ reliably switches the browser's selected alternate stylesheet set.
 ## Coverage and established behavior
 
 - HTML publication precedes `md_converted`, event-time HTML is retained across
-  updates, and converters/data persist. The element does **not** render HTML;
-  the fixture explicitly inserts published output into a separate DOM container.
+  updates, and converters/data persist. With the new options off the element does
+  **not** render HTML; the fixture inserts published output into a separate container.
+- Show HTML in this element renders into `div.markdown-pro` plus the CSS class, and
+  removes it when turned off. Highlight code automatically highlights `pre code` in
+  the published html; unknown languages stay plain with the `hljs` class.
+- Streaming mode closes trailing fences (including a partial closer), completes a
+  table header or partial delimiter row, holds back a lone `|`, and coalesces updates
+  into one conversion per frame; turning it off converts synchronously.
 - Tables, line breaks, strikeout, emoji, reference-image dimensions, new-window
   links, smooth preview and two-space nested lists exercise actual output and
   updates. Inline image dimensions are parsed even when the option is false;
@@ -93,10 +99,10 @@ reliably switches the browser's selected alternate stylesheet set.
   both theme links can remain enabled because each instance only disables its
   own cached previous theme. Repeating A's update or resetting does not repair
   this. No isolation guarantee or new global theme ownership policy is imposed.
-- Three consumed property names (`simplelinebreaks`, `smoothlivepreview`,
-  `parseimgdimensions`) differ from metadata camel casing. Both the discrepancy
-  and missing alias behavior are asserted. Bubble's actual property-key mapping
-  must be verified before changing this longstanding contract.
+- `update` reads only property names defined in the element metadata. Bubble
+  passes properties by field `name`, so `simpleLineBreaks`,
+  `smoothLivePreview` and `parseImgDimensions` are read in camelCase; the old
+  lowercase spelling is ignored.
 - Both reset bodies are empty and tested as no-ops: no teardown, state clearing,
   stylesheet cleanup or destruction is invented. Deprecated typography's empty
   initialize/update/reset get proportionate Node contract coverage. Its remote

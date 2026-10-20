@@ -29,7 +29,7 @@ test('deprecated typography callbacks are supplied no-ops, with no invented tear
   assert.deepEqual(h.history, []);
 });
 
-test('metadata outputs and explicit option spelling discrepancies stay reviewable', async () => {
+test('metadata outputs, and update only reads properties the metadata defines', async () => {
   const metadata = JSON.parse(await read('src/elements/md-to-html-AAC/AAC.json'));
   assert.deepEqual(Object.values(metadata.states).map(s => [s.name, s.value]), [['html', 'text']]);
   assert.deepEqual(Object.values(metadata.events).map(e => e.name), ['md_converted']);
@@ -37,7 +37,7 @@ test('metadata outputs and explicit option spelling discrepancies stay reviewabl
   const names = Object.values(metadata.fields).map(f => f.name);
   const update = (await source('md-to-html-AAC')).update;
   const consumed = [...new Set([...update.matchAll(/properties\.(\w+)/g)].map(m => m[1]))];
-  assert.deepEqual(consumed.filter(name => !names.includes(name)).sort(), ['parseimgdimensions', 'simplelinebreaks', 'smoothlivepreview']);
+  assert.deepEqual(consumed.filter(name => !names.includes(name)), []);
 });
 
 test('headers load the lib runtime bundle, and fixture theme subset retains production versions', async () => {
